@@ -11,7 +11,8 @@
                             <span>{{profile.fullName}}</span>
                         </template>
                         <el-menu-item-group title="">
-                            <el-menu-item index="" @click="logout">Odjava</el-menu-item>
+                            <el-menu-item index="" @click="logout(0)">Odjava</el-menu-item>
+                            <el-menu-item index="" @click="logout(1)">Odjavi & Zapri</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
                     <el-menu-item index="/home/main" active>
@@ -49,7 +50,7 @@
       }
     },
     methods: {
-      logout () {
+      logout (status) {
         let choice = eleRemote.dialog.showMessageBox(currentFrame, {
           type: 'question',
           buttons: ['Odjavi se!', 'Prekliči'],
@@ -58,8 +59,10 @@
         })
         if (choice === 0) {
           localStorage.clear()
-          eleRemote.app.relaunch()
-          eleRemote.app.exit(0)
+          this.$router.push('/login')
+          if (status === 1) {
+            eleRemote.app.exit(0)
+          }
         }
       }
     },

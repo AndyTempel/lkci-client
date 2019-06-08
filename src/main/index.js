@@ -21,9 +21,18 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
+let splash
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
+
+const splashURL = process.env.NODE_ENV === 'development'
+  ? `http://localhost:9080/#splash`
+  : `file://${__dirname}/index.html#splash`
+
+function sendStatusToSplash (text) {
+  splash.webContents.send('splashMsg', text)
+}
 
 function createWindow () {
   /**
@@ -33,14 +42,35 @@ function createWindow () {
     height: 500,
     useContentSize: true,
     width: 750,
-    icon: ''
+    icon: '',
+    resizable: false,
+    show: false
   })
   mainWindow.setMenuBarVisibility(false)
   mainWindow.setResizable(false)
 
+  splash = new BrowserWindow({width: 240, height: 480, frame: false, alwaysOnTop: true, transparent: true, skipTaskbar: true})
+  splash.loadURL(splashURL)
   mainWindow.loadURL(winURL)
 
+  splash.webContents.once('dom-ready', function () {
+    if (process.env.NODE_ENV !== 'development') {
+      autoUpdater.checkForUpdates()
+    } else {
+      sendStatusToSplash('Razhroščevanje omogočeno!')
+      setTimeout(function () {
+        splash.destroy()
+        mainWindow.show()
+      }, 3789)
+    }
+  })
+
+  splash.on('closed', () => {
+    splash = null
+  })
+
   mainWindow.on('closed', () => {
+    splash = null
     mainWindow = null
   })
 }
@@ -59,7 +89,26 @@ app.on('activate', () => {
   }
 })
 
-autoUpdater.on('update-downloaded', () => {
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToSplash('Checking for update...')
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToSplash('Update available.')
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToSplash('Posodobitev ni potrebna.')
+  splash.destroy()
+  mainWindow.show()
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToSplash('NAPAKA. ' + err)
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let logMessage = 'Prenašam ' + progressObj.percent + '%'
+  sendStatusToSplash(logMessage)
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToSplash('Prenos končan!')
   autoUpdater.quitAndInstall()
 })
 

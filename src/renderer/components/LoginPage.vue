@@ -25,6 +25,11 @@
 
 <script>
   import axios from 'axios'
+  import electron from 'electron'
+
+  // eslint-disable-next-line no-unused-vars
+  const eleRemote = electron.remote
+  const currentFrame = electron.remote.getCurrentWindow()
 
   export default {
     name: 'LoginPage',
@@ -74,6 +79,7 @@
           localStorage.setItem('tokenExp', new Date().getTime() + data.duration * 1000)
           localStorage.setItem('username', thisObj.$refs.username.value)
           localStorage.setItem('password', thisObj.$refs.password.value)
+          localStorage.setItem('serverBase', thisObj.serverBase)
           thisObj.showLoginBtn = false
           thisObj.titleText = 'Dokončevanje prijave ...'
           thisObj.hideFields = true
@@ -96,10 +102,42 @@
           alert('Prišlo je do napake pri pridobivanjem podatkov.\n' + err)
           window.location.reload()
         })
+      },
+      refreshLogin () {
+        this.showLoginBtn = false
+        this.titleText = 'Osveževanje prijave ...'
+        this.hideFields = true
+        const thisObj = this
+        axios.get(`${this.serverBase}/api/token`, {
+          timeout: 5000,
+          auth: {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password')
+          }
+        }).then(({data}) => {
+          localStorage.setItem('token', data.token)
+          localStorage.setItem('tokenExp', new Date().getTime() + data.duration * 1000)
+          thisObj.$router.push('/home')
+        }).catch(reason => {
+          localStorage.clear()
+          thisObj.hideFields = false
+          thisObj.titleText = 'Prijava'
+        })
       }
     },
     created () {
+      currentFrame.setResizable(false)
+      currentFrame.setSize(750, 500, true)
+      currentFrame.center()
+      currentFrame.setMovable(true)
+      currentFrame.setAlwaysOnTop(false)
+      if (localStorage.getItem('serverBase')) {
+        this.serverBase = localStorage.getItem('serverBase')
+      }
       this.checkServerStatus(null)
+      if (localStorage.getItem('tokenExp')) {
+        this.refreshLogin()
+      }
     }
   }
 </script>

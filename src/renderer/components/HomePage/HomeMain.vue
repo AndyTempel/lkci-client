@@ -1,6 +1,9 @@
 <template>
     <el-container>
-        <h3>Prijavljeni kot: {{profile.fullName}}</h3>
+        <el-header>
+            <h3>Prijavljeni kot: {{profile.fullName}}</h3>
+        </el-header>
+        <el-main>WIP</el-main>
     </el-container>
 </template>
 

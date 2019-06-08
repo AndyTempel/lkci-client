@@ -1,12 +1,16 @@
 {
   "name": "lkci-client",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "Andraž Korenč (andraz@korenc.eu)",
   "description": "Recognition and Detection of White Blood Cells.",
   "license": null,
   "main": "./dist/electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndyTempel/lkci-client.git"
+  },
   "scripts": {
-    "build": "node .electron-vue/build.js && electron-builder",
+    "build": "node .electron-vue/build.js && electron-builder -p always",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
@@ -46,7 +50,10 @@
       "icon": "build/icons/icon.icns"
     },
     "win": {
-      "icon": "build/icons/icon.ico"
+      "icon": "build/icons/icon.ico",
+      "publish": [
+        "github"
+      ]
     },
     "linux": {
       "icon": "build/icons"
@@ -54,6 +61,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "axios-concurrency": "^1.0.1",
     "element-ui": "^2.8.2",
     "jquery": "^3.4.1",
     "milligram": "^1.3.0",
@@ -80,7 +88,7 @@
     "css-loader": "^0.28.11",
     "del": "^3.0.0",
     "devtron": "^1.4.0",
-    "electron": "^2.0.4",
+    "electron": "^3.0.16",
     "electron-builder": "^20.19.2",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",

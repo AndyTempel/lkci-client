@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import elementUI from 'element-ui'
-import locale from 'element-ui/lib/locale/lang/en'
+import locale from 'element-ui/lib/locale/lang/sl'
 
 import App from './App'
 import router from './router'
